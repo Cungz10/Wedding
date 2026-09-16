@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Karla } from "next/font/google";
+import localFont from "next/font/local";
 import { Providers } from "@/components/Providers";
 import "./globals.css";
 
-const display = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+const display = localFont({
+  src: "../public/fonts/CormorantGaramond-SemiBold.woff2",
   variable: "--font-display",
 });
 
-const body = Karla({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const body = localFont({
+  src: "../public/fonts/Karla-Regular.woff2",
   variable: "--font-body",
 });
 
@@ -33,3 +31,4 @@ export default function RootLayout({
     </html>
   );
 }
+
