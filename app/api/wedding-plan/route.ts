@@ -112,6 +112,12 @@ export async function POST(request: Request) {
 
 export async function GET() {
   const { weddingPlan, isDemo } = await getCurrentWeddingPlan();
-  return NextResponse.json({ weddingPlan, isDemo });
-}
 
+  // budgetTotal Decimal Prisma jadi string pas di-JSON-in — convert ke number
+  // biar aman dipakai buat kalkulasi (-, /, *) sama .toLocaleString() di frontend.
+  const normalizedPlan = weddingPlan
+    ? { ...weddingPlan, budgetTotal: weddingPlan.budgetTotal != null ? Number(weddingPlan.budgetTotal) : null }
+    : weddingPlan;
+
+  return NextResponse.json({ weddingPlan: normalizedPlan, isDemo });
+}
