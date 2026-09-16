@@ -1,0 +1,15 @@
+export const ROADMAP_TEMPLATE: { phase: string; title: string }[] = [
+  { phase: "H-12", title: "Tentukan konsep & budget plafon" },
+  { phase: "H-12", title: "Booking venue" },
+  { phase: "H-12", title: "Mulai cari vendor utama (catering, MUA, fotografer)" },
+  { phase: "H-6", title: "DP vendor-vendor favorit" },
+  { phase: "H-6", title: "MCU pranikah" },
+  { phase: "H-6", title: "Bimbingan pranikah" },
+  { phase: "H-6", title: "Siapkan dokumen N1-N4 di kelurahan" },
+  { phase: "H-3", title: "Daftar nikah ke KUA" },
+  { phase: "H-3", title: "Fitting baju pengantin" },
+  { phase: "H-3", title: "Cetak & sebar undangan" },
+  { phase: "H-1", title: "Konfirmasi ulang semua vendor" },
+  { phase: "H-1", title: "Siapkan dokumen buat hari-H" },
+  { phase: "H-1", title: "Briefing tim/keluarga yang bantu" },
+];

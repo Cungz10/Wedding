@@ -32,6 +32,7 @@ export function OnboardingWizard() {
     budgetTotal: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const step = steps[stepIndex];
   const isLast = stepIndex === steps.length - 1;
@@ -46,13 +47,21 @@ export function OnboardingWizard() {
       return;
     }
     setSubmitting(true);
+    setError(null);
     try {
       const res = await fetch("/api/wedding-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      if (res.ok) router.push("/dashboard");
+      if (res.ok) {
+        router.push("/dashboard");
+        return;
+      }
+      const data = await res.json().catch(() => null);
+      setError(data?.error ?? "Gagal menyimpan, coba lagi ya.");
+    } catch {
+      setError("Gagal menyimpan, coba lagi ya.");
     } finally {
       setSubmitting(false);
     }
@@ -134,23 +143,26 @@ export function OnboardingWizard() {
         )}
       </div>
 
-      <div className="mt-10 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
-          disabled={stepIndex === 0}
-          className="text-sm text-ink/50 disabled:opacity-0"
-        >
-          Kembali
-        </button>
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={submitting}
-          className="rounded-full bg-plum px-8 py-3 text-sm font-medium text-ivory transition-colors hover:bg-plum-dark disabled:opacity-60"
-        >
-          {isLast ? (submitting ? "Menyimpan..." : "Selesai") : "Lanjut"}
-        </button>
+      <div className="mt-10 flex flex-col gap-3">
+        {error && <p className="text-center text-xs text-plum">{error}</p>}
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
+            disabled={stepIndex === 0}
+            className="text-sm text-ink/50 disabled:opacity-0"
+          >
+            Kembali
+          </button>
+          <button
+            type="button"
+            onClick={handleNext}
+            disabled={submitting}
+            className="rounded-full bg-plum px-8 py-3 text-sm font-medium text-ivory transition-colors hover:bg-plum-dark disabled:opacity-60"
+          >
+            {isLast ? (submitting ? "Menyimpan..." : "Selesai") : "Lanjut"}
+          </button>
+        </div>
       </div>
     </div>
   );
