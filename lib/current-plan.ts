@@ -15,6 +15,19 @@ export async function getCurrentWeddingPlan() {
 
   // Fallback demo user and plan for preview interactivity
   const demoUserId = "demo-user-1";
+
+  // Pastikan baris User demo beneran ada di DB, bukan cuma di in-memory mock,
+  // biar upsert WeddingPlan gak kena foreign key violation (P2003).
+  await prisma.user.upsert({
+    where: { id: demoUserId },
+    update: {},
+    create: {
+      id: demoUserId,
+      name: "Demo User",
+      email: "demo@nolkenikah.app",
+    },
+  });
+
   const weddingPlan = await prisma.weddingPlan.findUnique({
     where: { ownerId: demoUserId },
   });
