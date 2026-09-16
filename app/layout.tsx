@@ -4,12 +4,34 @@ import { Providers } from "@/components/Providers";
 import "./globals.css";
 
 const display = localFont({
-  src: "../public/fonts/CormorantGaramond-SemiBold.woff2",
+  src: [
+    {
+      path: "../public/fonts/CormorantGaramond-SemiBold.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/CormorantGaramond-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-display",
 });
 
 const body = localFont({
-  src: "../public/fonts/Karla-Regular.woff2",
+  src: [
+    {
+      path: "../public/fonts/Karla-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Karla-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+  ],
   variable: "--font-body",
 });
 
@@ -31,4 +53,3 @@ export default function RootLayout({
     </html>
   );
 }
-
