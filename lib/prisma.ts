@@ -539,15 +539,20 @@ function createInMemoryPrisma(): any {
 
 const globalForPrisma = globalThis as unknown as { prisma: any; mockPrisma: any };
 
-const mockPrisma = globalForPrisma.mockPrisma ?? createInMemoryPrisma();
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.mockPrisma = mockPrisma;
+// Lazy: mockPrisma baru dibikin (dan cuma di sinilah console.warn muncul)
+// pas beneran diakses lewat getMockPrisma(), bukan langsung pas file ini di-import.
+// Biar log "using in-memory mock" gak nongol terus meski DB asli konek normal.
+function getMockPrisma(): any {
+  if (!globalForPrisma.mockPrisma) {
+    globalForPrisma.mockPrisma = createInMemoryPrisma();
+  }
+  return globalForPrisma.mockPrisma;
 }
 
 function createResilientPrisma(): any {
   // If no DATABASE_URL, directly use in-memory mock
   if (!process.env.DATABASE_URL) {
-    return mockPrisma;
+    return getMockPrisma();
   }
 
   let realClient: PrismaClient;
@@ -565,7 +570,7 @@ function createResilientPrisma(): any {
     }
   } catch (err) {
     console.warn("[AI Studio] Failed to construct PrismaClient, falling back to mock:", err);
-    return mockPrisma;
+    return getMockPrisma();
   }
 
   let dbUnreachable = false;
@@ -573,7 +578,7 @@ function createResilientPrisma(): any {
   return new Proxy(realClient as object, {
     get(target: any, modelProp: string) {
       if (dbUnreachable) {
-        return mockPrisma[modelProp];
+        return getMockPrisma()[modelProp];
       }
 
       const originalModel = target[modelProp];
@@ -581,7 +586,7 @@ function createResilientPrisma(): any {
       // If it's a function on client (like $connect, $disconnect)
       if (typeof originalModel === "function") {
         return async (...args: any[]) => {
-          if (dbUnreachable) return (mockPrisma[modelProp] as any)?.(...args);
+          if (dbUnreachable) return (getMockPrisma()[modelProp] as any)?.(...args);
           try {
             return await originalModel.apply(target, args);
           } catch (err: any) {
@@ -592,7 +597,7 @@ function createResilientPrisma(): any {
             ) {
               console.warn("[AI Studio] Database connection unavailable — seamlessly using in-memory store.");
               dbUnreachable = true;
-              return (mockPrisma[modelProp] as any)?.(...args);
+              return (getMockPrisma()[modelProp] as any)?.(...args);
             }
             throw err;
           }
@@ -600,7 +605,7 @@ function createResilientPrisma(): any {
       }
 
       if (!originalModel || typeof originalModel !== "object") {
-        return originalModel ?? mockPrisma[modelProp];
+        return originalModel ?? getMockPrisma()[modelProp];
       }
 
       return new Proxy(originalModel, {
@@ -608,12 +613,12 @@ function createResilientPrisma(): any {
           const originalMethod = modelTarget[methodProp];
 
           if (typeof originalMethod !== "function") {
-            return originalMethod ?? mockPrisma[modelProp]?.[methodProp];
+            return originalMethod ?? getMockPrisma()[modelProp]?.[methodProp];
           }
 
           return async (...args: any[]) => {
             if (dbUnreachable) {
-              const fallbackFn = mockPrisma[modelProp]?.[methodProp];
+              const fallbackFn = getMockPrisma()[modelProp]?.[methodProp];
               return fallbackFn ? fallbackFn(...args) : null;
             }
 
@@ -631,7 +636,7 @@ function createResilientPrisma(): any {
                   `[AI Studio] Database connection failed during ${modelProp}.${methodProp} — seamlessly falling back to in-memory store.`
                 );
                 dbUnreachable = true;
-                const fallbackFn = mockPrisma[modelProp]?.[methodProp];
+                const fallbackFn = getMockPrisma()[modelProp]?.[methodProp];
                 return fallbackFn ? fallbackFn(...args) : null;
               }
               throw err;
@@ -644,4 +649,3 @@ function createResilientPrisma(): any {
 }
 
 export const prisma = createResilientPrisma();
-
