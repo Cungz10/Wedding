@@ -73,6 +73,8 @@ model WeddingPlan {
   venueCity     String?
   concept       String? // intimate / adat / modern
   budgetTotal   Decimal? @db.Decimal(14, 2)
+  guestCount    Int?
+  religion      String?
   onboardingDone Boolean @default(false)
 
   createdAt     DateTime @default(now())
