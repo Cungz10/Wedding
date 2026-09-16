@@ -32,6 +32,20 @@ export function LoginForm() {
     }
   }
 
+  function handleDemoLogin() {
+    setEmail("pengantin@example.com");
+    setPassword("password123");
+    signIn("credentials", {
+      email: "pengantin@example.com",
+      password: "password123",
+      redirect: false,
+    }).then((res) => {
+      if (res?.ok) {
+        router.push("/dashboard");
+      }
+    });
+  }
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div>
@@ -63,6 +77,14 @@ export function LoginForm() {
         className="mt-2 rounded-full bg-plum px-8 py-3 text-sm font-medium text-ivory transition-colors hover:bg-plum-dark disabled:opacity-60"
       >
         {submitting ? "Masuk..." : "Masuk"}
+      </button>
+
+      <button
+        type="button"
+        onClick={handleDemoLogin}
+        className="rounded-full border border-rose/40 bg-white/60 py-2.5 text-xs font-semibold text-plum transition-colors hover:bg-rose/20"
+      >
+        ✨ 1-Klik Masuk Akun Demo (Calon Pengantin)
       </button>
 
       <p className="text-center text-xs text-ink/50">

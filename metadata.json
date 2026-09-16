@@ -1,0 +1,6 @@
+{
+  "name": "Nol ke Nikah",
+  "description": "Perencana pernikahan mobile-first untuk pasangan Indonesia",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

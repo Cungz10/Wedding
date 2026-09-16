@@ -4,8 +4,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Opsional: Tambahin custom font family kalau belum di-config di tailwind.config.js */
 :root {
   --font-display: 'Cormorant Garamond', serif;
   --font-body: 'Karla', sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide scrollbar for clean horizontal chip navigation */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
