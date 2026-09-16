@@ -21,7 +21,15 @@ export async function GET() {
     where: { weddingPlanId: weddingPlan.id },
   });
 
-  return NextResponse.json({ items });
+  // Decimal Prisma ke-serialize jadi string di JSON — convert ke number
+  // biar gak ke-concat pas dijumlahin di frontend (reduce sum + string).
+  const normalizedItems = items.map((item) => ({
+    ...item,
+    estimatedCost: Number(item.estimatedCost),
+    actualCost: item.actualCost != null ? Number(item.actualCost) : null,
+  }));
+
+  return NextResponse.json({ items: normalizedItems });
 }
 
 export async function POST(request: Request) {
