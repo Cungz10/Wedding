@@ -1,3 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Karla:ital,wght@0,200..800;1,200..800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Opsional: Tambahin custom font family kalau belum di-config di tailwind.config.js */
+:root {
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Karla', sans-serif;
+}
