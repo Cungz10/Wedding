@@ -707,7 +707,7 @@ export function DashboardView() {
                 <div key={c.id} className="flex items-center justify-between rounded-xl border border-rose/20 bg-ivory/40 p-2.5 transition-all hover:bg-white hover:shadow-sm">
                   <div>
                     <p className="text-[11px] font-semibold text-ink">{c.invitedEmail}</p>
-                    <Badge variant="secondary" className="mt-1 py-0 px-1.5 text-[9px] border-none bg-rose/10 text-rose">
+                    <Badge variant="neutral" className="mt-1 py-0 px-1.5 text-[9px] border-none bg-rose/10 text-rose">
                       {c.role}
                     </Badge>
                   </div>
