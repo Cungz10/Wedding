@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentWeddingPlan } from "@/lib/current-plan";
 import { prisma } from "@/lib/prisma";
+import type { BudgetItem } from "@prisma/client";
 
 const budgetSchema = z.object({
   category: z.string().min(1, "Kategori wajib diisi"),
@@ -23,7 +24,7 @@ export async function GET() {
 
   // Decimal Prisma ke-serialize jadi string di JSON — convert ke number
   // biar gak ke-concat pas dijumlahin di frontend (reduce sum + string).
-  const normalizedItems = items.map((item) => ({
+  const normalizedItems = items.map((item: BudgetItem) => ({
     ...item,
     estimatedCost: Number(item.estimatedCost),
     actualCost: item.actualCost != null ? Number(item.actualCost) : null,
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
       where: { weddingPlanId: weddingPlan.id },
     });
     // Normalize Prisma Decimal → Number (sama seperti GET handler)
-    const normalizedItems = items.map((item) => ({
+    const normalizedItems = items.map((item: BudgetItem) => ({
       ...item,
       estimatedCost: Number(item.estimatedCost),
       actualCost: item.actualCost != null ? Number(item.actualCost) : null,
