@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Lightbulb } from "lucide-react";
 
 type FormState = {
   partnerName: string;
@@ -48,6 +49,7 @@ const steps = [
 export function OnboardingWizard() {
   const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
+  const [ownerName, setOwnerName] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>({
     partnerName: "",
     weddingDate: "",
@@ -59,6 +61,20 @@ export function OnboardingWizard() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Ambil nama user yang lagi login
+  useEffect(() => {
+    fetch("/api/wedding-plan")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.ownerName) setOwnerName(data.ownerName);
+        // Pre-fill partner name jika sebelumnya sudah pernah isi
+        if (data?.weddingPlan?.partnerName) {
+          setForm((prev) => ({ ...prev, partnerName: data.weddingPlan.partnerName }));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const step = steps[stepIndex];
   const isLast = stepIndex === steps.length - 1;
@@ -126,17 +142,43 @@ export function OnboardingWizard() {
 
         <div className="mt-8">
           {step.key === "partnerName" && (
-            <div>
-              <input
-                autoFocus
-                value={form.partnerName}
-                onChange={(e) => update("partnerName", e.target.value)}
-                placeholder="Contoh: Sarah Azzahra"
-                className="w-full border-b-2 border-rose/40 bg-transparent pb-3 font-display text-xl text-ink outline-none focus:border-plum"
-              />
-              <p className="mt-3 text-[11px] text-ink/50">
-                💡 Nama ini akan dipajang bersama di dashboard & undangan kolaborasi.
-              </p>
+            <div className="space-y-5">
+              {/* Nama user sendiri — read-only, diambil dari akun */}
+              <div>
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-rose">
+                  Nama Kamu
+                </label>
+                <div className="mt-2 flex items-center gap-2 border-b-2 border-plum/20 pb-2">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-plum text-xs font-bold text-ivory">
+                    {ownerName ? ownerName[0].toUpperCase() : "?"}
+                  </span>
+                  <span className="font-display text-lg font-semibold text-ink">
+                    {ownerName ?? "Memuat..."}
+                  </span>
+                  <span className="ml-auto rounded-full bg-plum/10 px-2 py-0.5 text-[10px] font-medium text-plum">
+                    dari akun
+                  </span>
+                </div>
+                <p className="mt-1 text-[11px] text-ink/40">
+                  Nama ini diambil dari akun yang kamu daftarkan.
+                </p>
+              </div>
+              {/* Nama pasangan — input */}
+              <div>
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-rose">
+                  Nama Pasangan
+                </label>
+                <input
+                  autoFocus
+                  value={form.partnerName}
+                  onChange={(e) => update("partnerName", e.target.value)}
+                  placeholder="Contoh: Sarah Azzahra"
+                  className="mt-2 w-full border-b-2 border-rose/40 bg-transparent pb-3 font-display text-xl text-ink outline-none focus:border-plum"
+                />
+                <p className="mt-2 text-[11px] text-ink/50 flex items-start gap-1">
+                  <Lightbulb className="h-3.5 w-3.5 mt-px shrink-0" /> Nama ini akan dipajang bersama di dashboard &amp; undangan kolaborasi.
+                </p>
+              </div>
             </div>
           )}
 

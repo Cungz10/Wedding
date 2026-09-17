@@ -97,6 +97,7 @@ model RoadmapTask {
   dueDate       DateTime?
   isDone        Boolean  @default(false)
   notes         String?  @db.Text
+  updatedBy     String?
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -112,6 +113,7 @@ model BudgetItem {
   estimatedCost Decimal  @db.Decimal(14, 2)
   actualCost    Decimal? @db.Decimal(14, 2)
   isPaid        Boolean  @default(false)
+  updatedBy     String?
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -126,6 +128,7 @@ model Vendor {
   category      String   // catering, MUA, fotografer, dekorasi, MC, dll
   contact       String?
   status        String   @default("prospect") // prospect / negotiating / booked
+  quotedPrice   Decimal? @db.Decimal(14, 2)
   dpAmount      Decimal? @db.Decimal(14, 2)
   notes         String?  @db.Text
 
@@ -142,6 +145,8 @@ model Document {
   fileUrl       String?
   status        String   @default("pending") // pending / uploaded / verified
   note          String?
+  deadlineDays  Int      @default(30)       // target selesai H- berapa hari
+  updatedBy     String?
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

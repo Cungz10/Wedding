@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BookOpen, Folder, Map, Pin, Check, Pencil, Clock } from "lucide-react";
 
 type DocItem = {
   id: string;
@@ -8,26 +9,27 @@ type DocItem = {
   status: string;
   note: string | null;
   deadlineDays: number;
+  updatedBy?: string | null;
 };
 
 const STATUS_CONFIG: Record<
   string,
-  { label: string; color: string; badge: string }
+  { label: string; color: string; badge: React.ReactNode }
 > = {
   pending: {
     label: "Belum Siap",
     color: "text-amber-700 bg-amber-50 border-amber-200",
-    badge: "⏳",
+    badge: <Clock className="h-3.5 w-3.5 text-amber-600" />,
   },
   ready: {
     label: "Siap di Map",
     color: "text-blue-700 bg-blue-50 border-blue-200",
-    badge: "📁",
+    badge: <Folder className="h-3.5 w-3.5 text-blue-600" />,
   },
   verified: {
     label: "Terverifikasi Resmi",
     color: "text-emerald-700 bg-emerald-50 border-emerald-200",
-    badge: "✓",
+    badge: <Check className="h-3.5 w-3.5 text-emerald-600" />,
   },
 };
 
@@ -183,9 +185,9 @@ export function DokumenView() {
         <div className="mt-4 flex gap-2">
           <button
             onClick={() => setShowGuide(!showGuide)}
-            className="flex-1 rounded-xl border border-plum/30 bg-white/80 py-2 text-xs font-semibold text-plum hover:bg-plum/10 transition-colors"
+            className="flex-1 rounded-xl border border-plum/30 bg-white/80 py-2 text-xs font-semibold text-plum hover:bg-plum/10 transition-colors flex items-center justify-center gap-1.5"
           >
-            {showGuide ? "✕ Sembunyikan Alur Birokrasi" : "🗺️ Lihat Urutan Alur Birokrasi"}
+            {showGuide ? "✕ Sembunyikan Alur Birokrasi" : <><Map className="w-3.5 h-3.5" /> Lihat Urutan Alur Birokrasi</>}
           </button>
           <button
             onClick={() => setShowAddDoc(true)}
@@ -200,8 +202,8 @@ export function DokumenView() {
       {showGuide && (
         <section className="rounded-3xl border border-plum/30 bg-white/95 p-5 shadow-md space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-display text-base font-bold text-plum-dark">
-              📖 Urutan Resmi Pengurusan Berkas (Anti-Bingung)
+            <h3 className="font-display text-base font-bold text-plum-dark flex items-center gap-2">
+              <BookOpen className="w-4 h-4" /> Urutan Resmi Pengurusan Berkas (Anti-Bingung)
             </h3>
             <button
               onClick={() => setShowGuide(false)}
@@ -405,9 +407,9 @@ export function DokumenView() {
                           setEditingNoteId(item.id);
                           setTempNote(item.note || "");
                         }}
-                        className="cursor-pointer text-ink/60 hover:text-plum line-clamp-1"
+                        className="cursor-pointer text-ink/60 hover:text-plum line-clamp-1 flex items-start gap-1.5"
                       >
-                        📌 {item.note}
+                        <Pin className="w-3.5 h-3.5 mt-px shrink-0" /> {item.note}
                       </p>
                     ) : (
                       <button
@@ -426,20 +428,29 @@ export function DokumenView() {
                 {/* Status selector buttons */}
                 <div className="mt-3 flex items-center justify-between border-t border-rose/10 pt-2.5">
                   <span className="text-[11px] text-ink/50">Status berkas:</span>
-                  <div className="flex gap-1.5">
-                    {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-                      <button
-                        key={key}
-                        onClick={() => updateStatus(item.id, key)}
-                        className={`rounded-lg px-2 py-1 text-[10px] font-semibold transition-all ${
-                          item.status === key
-                            ? cfg.color + " ring-1 ring-plum/20 shadow-xs"
-                            : "bg-ivory/80 text-ink/50 hover:bg-rose/10"
-                        }`}
-                      >
-                        {cfg.label}
-                      </button>
-                    ))}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-1.5 justify-end">
+                      {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+                        <button
+                          key={key}
+                          onClick={() => updateStatus(item.id, key)}
+                          className={`rounded-lg px-2 py-1 text-[10px] font-semibold transition-all ${
+                            item.status === key
+                              ? cfg.color + " ring-1 ring-plum/20 shadow-xs"
+                              : "bg-ivory/80 text-ink/50 hover:bg-rose/10"
+                          }`}
+                        >
+                          {cfg.label}
+                        </button>
+                      ))}
+                    </div>
+                    {item.updatedBy && (
+                      <div className="flex justify-end">
+                        <span className="text-[9px] font-medium text-ink/40 bg-ivory px-1.5 py-0.5 rounded border border-rose/10 flex items-center gap-1">
+                          <Pencil className="w-3 h-3" /> Diubah oleh {item.updatedBy}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

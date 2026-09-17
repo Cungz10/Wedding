@@ -69,7 +69,13 @@ export async function POST(request: Request) {
     const items = await prisma.budgetItem.findMany({
       where: { weddingPlanId: weddingPlan.id },
     });
-    return NextResponse.json({ items }, { status: 201 });
+    // Normalize Prisma Decimal → Number (sama seperti GET handler)
+    const normalizedItems = items.map((item) => ({
+      ...item,
+      estimatedCost: Number(item.estimatedCost),
+      actualCost: item.actualCost != null ? Number(item.actualCost) : null,
+    }));
+    return NextResponse.json({ items: normalizedItems }, { status: 201 });
   }
 
   const parsed = budgetSchema.safeParse(json);
@@ -91,11 +97,18 @@ export async function POST(request: Request) {
     },
   });
 
-  return NextResponse.json({ item }, { status: 201 });
+  // Normalize Decimal → Number
+  const normalizedItem = {
+    ...item,
+    estimatedCost: Number(item.estimatedCost),
+    actualCost: item.actualCost != null ? Number(item.actualCost) : null,
+  };
+
+  return NextResponse.json({ item: normalizedItem }, { status: 201 });
 }
 
 export async function PATCH(request: Request) {
-  const { weddingPlan } = await getCurrentWeddingPlan();
+  const { weddingPlan, currentUserName } = await getCurrentWeddingPlan();
   if (!weddingPlan) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -113,6 +126,7 @@ export async function PATCH(request: Request) {
   if (data.estimatedCost !== undefined) updateData.estimatedCost = Number(data.estimatedCost);
   if (data.actualCost !== undefined) updateData.actualCost = data.actualCost != null ? Number(data.actualCost) : null;
   if (data.isPaid !== undefined) updateData.isPaid = Boolean(data.isPaid);
+  updateData.updatedBy = currentUserName;
 
   const item = await prisma.budgetItem.update({
     where: { id },

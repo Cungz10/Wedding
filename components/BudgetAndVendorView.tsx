@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Wallet, Handshake, Phone, Pencil, FileEdit, Scale } from "lucide-react";
 
 type BudgetItem = {
   id: string;
@@ -9,6 +10,7 @@ type BudgetItem = {
   estimatedCost: number;
   actualCost: number | null;
   isPaid: boolean;
+  updatedBy?: string | null;
 };
 
 type Vendor = {
@@ -253,7 +255,7 @@ export function BudgetAndVendorView() {
               : "text-ink/70 hover:text-plum"
           }`}
         >
-          💰 Pos & Tracking Budget
+          <Wallet className="h-4 w-4 mr-1.5 inline" /> Pos & Tracking Budget
         </button>
         <button
           onClick={() => setActiveTab("vendor")}
@@ -263,7 +265,7 @@ export function BudgetAndVendorView() {
               : "text-ink/70 hover:text-plum"
           }`}
         >
-          🤝 Riset & Vendor ({vendors.length})
+          <Handshake className="h-4 w-4 mr-1.5 inline" /> Riset & Vendor ({vendors.length})
         </button>
       </div>
 
@@ -501,6 +503,14 @@ export function BudgetAndVendorView() {
                       {item.isPaid ? "✓ Terbayar / DP" : "○ Belum Bayar"}
                     </button>
                   </div>
+                  
+                  {item.updatedBy && (
+                    <div className="mt-1 flex justify-end">
+                      <span className="text-[9px] font-medium text-ink/40 bg-ivory px-1.5 py-0.5 rounded border border-rose/10 flex items-center gap-1">
+                        <Pencil className="h-3 w-3" /> Diubah oleh {item.updatedBy}
+                      </span>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -784,15 +794,15 @@ export function BudgetAndVendorView() {
                     </div>
 
                     {vendor.contact && (
-                      <div className="mt-2 text-xs text-ink/70">
-                        📞 Kontak:{" "}
+                      <div className="mt-2 text-xs text-ink/70 flex items-center gap-1">
+                        <Phone className="h-3.5 w-3.5" /> Kontak:{" "}
                         <span className="font-medium text-plum">{vendor.contact}</span>
                       </div>
                     )}
 
                     {vendor.notes && (
-                      <p className="mt-2 rounded-xl bg-ivory/60 p-2.5 text-xs text-ink/70">
-                        📝 {vendor.notes}
+                      <p className="mt-2 rounded-xl bg-ivory/60 p-2.5 text-xs text-ink/70 flex items-start gap-1.5">
+                        <FileEdit className="h-4 w-4 mt-px shrink-0" /> {vendor.notes}
                       </p>
                     )}
 
@@ -822,8 +832,8 @@ export function BudgetAndVendorView() {
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
               <div className="w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-3xl bg-ivory p-6 shadow-xl">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-display text-lg font-bold text-plum-dark">
-                    ⚖️ Perbandingan Vendor
+                  <h3 className="font-display text-lg font-bold text-plum-dark flex items-center gap-2">
+                    <Scale className="h-5 w-5" /> Perbandingan Vendor
                   </h3>
                   <button
                     onClick={() => setShowCompareModal(false)}

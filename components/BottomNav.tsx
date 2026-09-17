@@ -54,6 +54,16 @@ const navItems: NavItem[] = [
       </svg>
     ),
   },
+  {
+    href: "/profile",
+    label: "Profil",
+    icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.6}>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M20 21a8 8 0 0 0-16 0" />
+      </svg>
+    ),
+  },
 ];
 
 export function BottomNav() {
@@ -61,7 +71,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-rose/30 bg-ivory/95 backdrop-blur
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-rose/20 bg-white/70 backdrop-blur-md shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)]
                  pb-[env(safe-area-inset-bottom)]"
       aria-label="Navigasi utama"
     >

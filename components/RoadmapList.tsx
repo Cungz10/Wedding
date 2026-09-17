@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ClipboardList, Sparkles, FileEdit, Pencil } from "lucide-react";
 
 type Task = {
   id: string;
@@ -9,6 +10,7 @@ type Task = {
   isDone: boolean;
   dueDate: string | null;
   notes?: string | null;
+  updatedBy?: string | null;
 };
 
 const PHASE_META: Record<string, { label: string; desc: string; badgeColor: string }> = {
@@ -155,7 +157,9 @@ export function RoadmapList() {
   if (tasks.length === 0) {
     return (
       <div className="mt-8 rounded-3xl border border-rose/30 bg-white/70 p-6 text-center shadow-sm">
-        <span className="text-3xl">📋</span>
+        <span className="flex justify-center text-plum mb-2">
+          <ClipboardList className="h-10 w-10" />
+        </span>
         <h3 className="mt-2 font-display text-lg font-semibold text-plum-dark">
           Roadmap Belum Ada
         </h3>
@@ -167,7 +171,7 @@ export function RoadmapList() {
           disabled={seeding}
           className="mt-4 rounded-full bg-plum px-6 py-2.5 text-xs font-semibold text-ivory hover:bg-plum-dark disabled:opacity-60 shadow-sm"
         >
-          {seeding ? "Menyiapkan Roadmap..." : "✨ Muat Roadmap Lengkap (Indonesia)"}
+          {seeding ? "Menyiapkan Roadmap..." : <><Sparkles className="h-3.5 w-3.5 inline mr-1" /> Muat Roadmap Lengkap (Indonesia)</>}
         </button>
       </div>
     );
@@ -375,9 +379,9 @@ export function RoadmapList() {
                                   setEditingNoteId(task.id);
                                   setTempNote(task.notes || "");
                                 }}
-                                className="cursor-pointer text-xs text-ink/60 hover:text-plum line-clamp-1"
+                                className="cursor-pointer text-xs text-ink/60 hover:text-plum line-clamp-1 flex items-start gap-1.5"
                               >
-                                📝 {task.notes}
+                                <FileEdit className="h-3.5 w-3.5 shrink-0 mt-px" /> {task.notes}
                               </p>
                             ) : (
                               <button
@@ -390,6 +394,13 @@ export function RoadmapList() {
                                 + Tambah catatan
                               </button>
                             )}
+                          </div>
+                        )}
+                        {task.updatedBy && (
+                          <div className="mt-1 flex justify-end">
+                            <span className="text-[9px] font-medium text-ink/40 bg-ivory px-1.5 py-0.5 rounded border border-rose/10 flex items-center gap-1">
+                              <Pencil className="h-3 w-3" /> Diubah oleh {task.updatedBy}
+                            </span>
                           </div>
                         )}
                       </div>

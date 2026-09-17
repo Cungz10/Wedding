@@ -83,7 +83,7 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const { weddingPlan } = await getCurrentWeddingPlan();
+  const { weddingPlan, currentUserName } = await getCurrentWeddingPlan();
   if (!weddingPlan) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -99,6 +99,7 @@ export async function PATCH(request: Request) {
   if (status !== undefined) updateData.status = status;
   if (note !== undefined) updateData.note = note;
   if (fileUrl !== undefined) updateData.fileUrl = fileUrl;
+  updateData.updatedBy = currentUserName;
 
   const document = await prisma.document.update({
     where: { id },

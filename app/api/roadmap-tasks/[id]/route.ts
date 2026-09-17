@@ -18,7 +18,7 @@ export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const { weddingPlan } = await getCurrentWeddingPlan();
+  const { weddingPlan, currentUserName } = await getCurrentWeddingPlan();
   if (!weddingPlan) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -39,7 +39,10 @@ export async function PATCH(
 
   const task = await prisma.roadmapTask.update({
     where: { id: params.id },
-    data: parsed.data,
+    data: {
+      ...parsed.data,
+      updatedBy: currentUserName,
+    },
   });
 
   return NextResponse.json({ task });

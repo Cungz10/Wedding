@@ -3,6 +3,8 @@ import { z } from "zod";
 import { getCurrentWeddingPlan } from "@/lib/current-plan";
 import { prisma } from "@/lib/prisma";
 import { ROADMAP_TEMPLATE } from "@/lib/roadmap-templates";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 const onboardingSchema = z.object({
   partnerName: z.string().min(1, "Nama pasangan wajib diisi"),
@@ -111,7 +113,20 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  const { weddingPlan, isDemo } = await getCurrentWeddingPlan();
+  const { userId, weddingPlan, isDemo } = await getCurrentWeddingPlan();
+
+  // Ambil nama user owner dari DB langsung
+  let ownerName: string | null = null;
+  if (userId && !isDemo) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true },
+    });
+    ownerName = user?.name ?? null;
+  } else if (isDemo) {
+    // Demo user pakai nama mock
+    ownerName = "Rendra Mukuti";
+  }
 
   // budgetTotal Decimal Prisma jadi string pas di-JSON-in — convert ke number
   // biar aman dipakai buat kalkulasi (-, /, *) sama .toLocaleString() di frontend.
@@ -119,5 +134,13 @@ export async function GET() {
     ? { ...weddingPlan, budgetTotal: weddingPlan.budgetTotal != null ? Number(weddingPlan.budgetTotal) : null }
     : weddingPlan;
 
-  return NextResponse.json({ weddingPlan: normalizedPlan, isDemo });
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email || null;
+
+  return NextResponse.json({ 
+    weddingPlan: normalizedPlan, 
+    ownerName, 
+    isDemo,
+    userEmail
+  });
 }

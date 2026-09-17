@@ -7,10 +7,33 @@ export async function getCurrentWeddingPlan() {
   const userId = (session?.user as any)?.id as string | undefined;
 
   if (userId) {
+    // PENTING: Cek invite yang sudah accepted DULUAN.
+    // Kalau user sudah menerima undangan kolaborasi, dia harus melihat
+    // workspace pengundang, BUKAN plan kosong miliknya sendiri.
+    if (session?.user?.email) {
+      const acceptedInvite = await prisma.collaboratorInvite.findFirst({
+        where: { 
+          invitedEmail: session.user.email,
+          status: "accepted" 
+        },
+        include: { weddingPlan: true }
+      });
+      if (acceptedInvite) {
+        return { 
+          userId, 
+          weddingPlan: acceptedInvite.weddingPlan, 
+          isDemo: false, 
+          currentUserName: session?.user?.name || "User" 
+        };
+      }
+    }
+
+    // Kalau bukan kolaborator, cek plan milik sendiri (sebagai owner)
     const weddingPlan = await prisma.weddingPlan.findUnique({
       where: { ownerId: userId },
     });
-    return { userId, weddingPlan, isDemo: false };
+
+    return { userId, weddingPlan, isDemo: false, currentUserName: session?.user?.name || "User" };
   }
 
   // Fallback demo user and plan for preview interactivity
@@ -32,5 +55,5 @@ export async function getCurrentWeddingPlan() {
     where: { ownerId: demoUserId },
   });
 
-  return { userId: demoUserId, weddingPlan, isDemo: true };
+  return { userId: demoUserId, weddingPlan, isDemo: true, currentUserName: "Demo User" };
 }
